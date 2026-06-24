@@ -31,6 +31,9 @@ class Figurinha(Base):
     #Número da figurinha da seleção (de 0 a 20)
     numero = Column(Integer, nullable=False)
 
+    #observação em str sobre as figurinhas coladas/ repetidas
+    observacao = Column(String(255), nullable=True)
+    
     #Quantidade de figurinhas coladas/repetidas (Assume valor padrão de 1)
     quantidade = Column(Integer, nullable=False, default=1)
 
@@ -40,9 +43,10 @@ class Figurinha(Base):
     #Foreignkey para identificar o usuario
     usuario_id = Column(Integer, ForeignKey("usuarios.id"), nullable=False)
 
-    def __init__(self, sigla, numero, usuario_id, quantidade=1, created_at=None):
+    def __init__(self, sigla, numero, observacao, usuario_id, quantidade=1, created_at=None):
         self.sigla = sigla
         self.numero = numero
+        self.observacao = observacao
         self.usuario_id = usuario_id
         self.quantidade = quantidade
         self.created_at = created_at
