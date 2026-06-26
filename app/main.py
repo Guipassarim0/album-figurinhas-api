@@ -18,6 +18,7 @@ bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 from app.routers.figurinhas_routes import figurinhas_router
 from app.routers.auth_routes import auth_router
 
-app.include_router(figurinhas_router)
 app.include_router(auth_router)
+app.include_router(figurinhas_router)
+
 
