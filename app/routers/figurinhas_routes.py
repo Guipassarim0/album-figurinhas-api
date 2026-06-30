@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException   
+from fastapi import APIRouter, Depends, HTTPException, Path
 from app.models import Figurinha, Usuario
 from app.dependencies import pegar_sessao, verificar_token
 from sqlalchemy.orm import Session
@@ -26,22 +26,27 @@ async def criar_figurinha(figurinha_schema: Figurinha_Schema, usuario: Usuario =
         session.commit()
         return {'mensagem': f'Figurinha nova cadastrada com sucesso {figurinha_schema.sigla}, {figurinha_schema.numero}, [+{figurinha_schema.quantidade}]'}
     
-@figurinhas_router.get("/listar", response_model=list[str])
+@figurinhas_router.get("/listar")
 async def listar_figurinhas(usuario: Usuario = Depends(verificar_token), session: Session = Depends(pegar_sessao)):
     """
     Traz todas as figurinhas que pertencem ao ID do usuário que está logado
     """
-    lista_formatada = []
 
     minhas_figurinhas = session.query(Figurinha).filter(Figurinha.usuario_id == usuario.id).all()
     if not minhas_figurinhas:
         raise HTTPException(status_code=404, detail="Figurinha Não Encontrada")
+    
 
-    for figurinha in minhas_figurinhas:
-        texto = f"{figurinha.sigla} {figurinha.numero} -- {figurinha.quantidade}"
-        lista_formatada.append(texto)
+    return [
 
-    return lista_formatada
+        {
+            "sigla": figurinha.sigla,
+            "numero": figurinha.numero,
+            "quantidade": (figurinha.quantidade)-1,
+            "observacao": figurinha.observacao
+        }
+        for figurinha in minhas_figurinhas
+    ]
 
 @figurinhas_router.post("/remover_figurinha")
 async def remover_figurinha(figurinha_schema:Figurinha_Schema, usuario = Depends(verificar_token), session: Session = Depends(pegar_sessao)):
@@ -58,3 +63,65 @@ async def remover_figurinha(figurinha_schema:Figurinha_Schema, usuario = Depends
         session.delete(figurinha_removida)
         session.commit()
         return {"mensagem": f"Figurinha Deletada [-] do Album: {figurinha_schema.sigla, figurinha_schema.numero}"}
+
+
+@figurinhas_router.get("/repetidas")
+async def verificar_repetidas(
+    usuario: Usuario = Depends(verificar_token),
+    session: Session = Depends(pegar_sessao)):
+
+    """
+    Esta é a rota padrão de listagem de figurinhas repetidas, toda listagem de repetidas precisa de uma autenticação prévia!
+    """
+    figurinhas_repetidas = session.query(Figurinha).filter(Figurinha.usuario_id == usuario.id, Figurinha.quantidade > 1).all()
+
+    #Utilizando List Comprehension para filtrar os dados em formato json
+    return [
+
+        {
+            "sigla": figurinha.sigla,
+            "numero": figurinha.numero,
+            "quantidade": (figurinha.quantidade)-1,
+            "observacao": figurinha.observacao
+        }
+        for figurinha in figurinhas_repetidas
+    ]
+
+@figurinhas_router.get("/progresso")
+async def mostrar_progresso(
+    usuario: Usuario = Depends(verificar_token), 
+    session: Session = Depends(pegar_sessao)):
+
+    """
+    Esta é a rota padrão para listagem de progresso do album, a rota de listagem do progresso precisa de uma autenticação prévia!
+    """
+    TOTAL_ALBUM = 994
+    quantidade_figurinhas  = session.query(Figurinha).filter(Figurinha.usuario_id == usuario.id).count()
+    final_percentual = (quantidade_figurinhas/TOTAL_ALBUM) * 100
+    return {
+    "figurinhas": quantidade_figurinhas,
+    "total_album": TOTAL_ALBUM,
+    "progresso_percentual": round(final_percentual, 2)
+        }
+@figurinhas_router.get("/{sigla}/{numero}")
+async def destacar_figurinha(
+    sigla:str = Path(..., min_length=3, max_length=3, description="A sigla da seleção com 3 letras"), 
+    numero:int = Path(..., ge=1, description="O número da figurinha deve ser maior ou igual a 1"),
+    usuario: Usuario = Depends(verificar_token),
+    session: Session = Depends(pegar_sessao)):
+
+    """
+    Esta é a rota padrão para consulta detalhada de figurinha, a rota consulta detalhada precisa de uma autenticação prévia!
+    """
+    # Validando que a sigla sera maiuscula para consulta correta na tabela
+    sigla_upper = sigla.upper()
+    figurinha_destacada = session.query(Figurinha).filter(Figurinha.usuario_id == usuario.id, Figurinha.sigla==sigla_upper, Figurinha.numero==numero).first()
+    if not figurinha_destacada:
+        raise HTTPException(status_code=404, detail="Figurinha Não Encontrada")
+
+    return {
+    "sigla": figurinha_destacada.sigla,
+    "numero": figurinha_destacada.numero,
+    "quantidade": figurinha_destacada.quantidade,
+    "observação": figurinha_destacada.observacao
+            }
