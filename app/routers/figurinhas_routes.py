@@ -49,21 +49,33 @@ async def listar_figurinhas(usuario: Usuario = Depends(verificar_token), session
     ]
 
 @figurinhas_router.post("/remover_figurinha")
-async def remover_figurinha(figurinha_schema:Figurinha_Schema, usuario = Depends(verificar_token), session: Session = Depends(pegar_sessao)):
-    figurinha_removida = session.query(Figurinha).filter(Figurinha.sigla==figurinha_schema.sigla, Figurinha.numero==figurinha_schema.numero, Figurinha.usuario_id==usuario.id).first()
+async def remover_figurinha(
+    figurinhaschema: Figurinha_Schema,
+    usuario: Usuario = Depends(verificar_token),
+    session: Session = Depends(pegar_sessao)):
+
+    """
+    Esta é a rota padrão de remoção de figurinha, toda remoção de figurinha precisa de uma autenticação prévia!
+    """
+    figurinha_removida = session.query(Figurinha).filter(Figurinha.sigla == figurinhaschema.sigla, Figurinha.numero == figurinhaschema.numero, Figurinha.usuario_id == usuario.id).first()
+
     if not figurinha_removida:
         raise HTTPException(status_code=404, detail="Figurinha Não Encontrada")
-    elif figurinha_removida.quantidade > figurinha_schema.quantidade:
-        # Não deletar uma linha, apenas diminuir a quantidade
-        figurinha_removida.quantidade -= figurinha_schema.quantidade
-        session.commit()
-        return {"mensagem": f"Figurinha(s) removida [!] com SUCESSO: {figurinha_schema.sigla, figurinha_schema.numero} [-{figurinha_schema.quantidade}]"}
-    else:
-        # Se o numero a remover for maior ou igual que a quantidade, deletar a linha do banco de dados
-        session.delete(figurinha_removida)
-        session.commit()
-        return {"mensagem": f"Figurinha Deletada [-] do Album: {figurinha_schema.sigla, figurinha_schema.numero}"}
 
+    # Se o numero a remover for maior que a quantidade, status 400 quantidade indisponivel para retirada
+    if figurinhaschema.quantidade > figurinha_removida.quantidade: raise HTTPException(status_code=400, detail="Quantidade maior que a disponível")
+
+    # Não deletar uma linha, apenas diminuir a quantidade
+    if figurinhaschema.quantidade < figurinha_removida.quantidade:
+        figurinha_removida.quantidade -= figurinhaschema.quantidade
+        session.commit()
+        return {"mensagem": f"Figurinha(s) removida [!] com SUCESSO: {figurinhaschema.sigla, figurinhaschema.numero} [-{figurinhaschema.quantidade}]"}
+
+    # Se o numero a remover for igual a quantidade, deletar a linha do banco de dados
+    session.delete(figurinha_removida)
+    session.commit()
+
+    return {"mensagem": f"Figurinha Deletada [-] do Album: {figurinhaschema.sigla, figurinhaschema.numero}"}
 
 @figurinhas_router.get("/repetidas")
 async def verificar_repetidas(
