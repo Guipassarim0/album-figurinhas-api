@@ -1,15 +1,15 @@
 # 🎴 Sticker Album API
 
-API REST desenvolvida em **Python** com **FastAPI** para gerenciamento de álbuns de figurinhas, incluindo autenticação JWT, controle de usuários, gerenciamento completo das figurinhas e execução totalmente **dockerizada**.
+API REST desenvolvida em **Python** com **FastAPI** para gerenciamento de um álbum de figurinhas, incluindo autenticação JWT, controle de usuários, gerenciamento completo das figurinhas e ambiente totalmente **dockerizado**.
 
 ---
 
-# 🚀 Funcionalidades
+# ✨ Funcionalidades
 
 ## 🔐 Autenticação
 
 - Cadastro de usuários
-- Login com JWT
+- Login utilizando JWT
 - Login compatível com OAuth2
 - Refresh Token
 - Rotas protegidas por autenticação
@@ -33,8 +33,8 @@ API REST desenvolvida em **Python** com **FastAPI** para gerenciamento de álbun
 ## 🐳 Docker
 
 - Aplicação totalmente dockerizada
-- Banco de dados PostgreSQL executando em container
-- Orquestração utilizando Docker Compose
+- Banco de dados PostgreSQL em container
+- Orquestração com Docker Compose
 - Ambiente padronizado para desenvolvimento e execução
 
 ---
@@ -59,27 +59,27 @@ API REST desenvolvida em **Python** com **FastAPI** para gerenciamento de álbun
 # 📂 Estrutura do Projeto
 
 ```text
-app/
-├── routers/
-│   ├── auth_routes.py
-│   └── figurinha_routes.py
-│
-├── models.py
-├── schemas.py
-├── database.py
-├── dependencies.py
-├── main.py
-│
-alembic/
-docker-compose.yml
-Dockerfile
-.env
-requirements.txt
+.
+├── alembic/
+├── app/
+│   ├── routers/
+│   │   ├── auth_routes.py
+│   │   └── figurinha_routes.py
+│   ├── database.py
+│   ├── dependencies.py
+│   ├── main.py
+│   ├── models.py
+│   └── schemas.py
+├── .env.example
+├── docker-compose.yml
+├── Dockerfile
+├── requirements.txt
+└── README.md
 ```
 
 ---
 
-# ⚙️ Instalação
+# 🚀 Instalação
 
 ## 1. Clone o repositório
 
@@ -91,40 +91,63 @@ cd album-figurinhas-api
 
 ---
 
-# 🔧 Configuração
+# ⚙️ Configuração
 
-Crie um arquivo `.env` na raiz do projeto.
+Crie um arquivo `.env` na raiz do projeto utilizando o `.env.example` como base.
 
-```env
-SECRET_KEY=sua_chave_secreta
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=30
+### Linux / macOS
 
-DATABASE_URL=postgresql://usuario:senha@db:5432/sticker_album
+```bash
+cp .env.example .env
 ```
 
-> **Observação:** ao utilizar Docker, o host do banco deve ser o nome do serviço definido no `docker-compose.yml` (ex.: `db`).
+### Windows (PowerShell)
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Edite o arquivo `.env` com as configurações desejadas.
+
+Exemplo:
+
+```env
+DB_USER=postgres
+DB_PASSWORD=your_password
+DB_HOST=db
+DB_PORT=5432
+DB_NAME=album_db
+
+SECRET_KEY=your_secret_key
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+```
+
+> **Importante**
+>
+> - Ao utilizar **Docker Compose**, mantenha `DB_HOST=db`.
+> - Ao executar a aplicação localmente, altere `DB_HOST=localhost`.
 
 ---
 
-# ▶️ Executando com Docker (Recomendado)
+# 🐳 Executando com Docker (Recomendado)
 
-Construir as imagens:
+## Construir as imagens
 
 ```bash
 docker compose build
 ```
 
-Iniciar os containers:
-
-```bash
-docker compose up
-```
-
-Ou em segundo plano:
+## Iniciar os containers
 
 ```bash
 docker compose up -d
+```
+
+## Executar as migrações
+
+```bash
+docker compose exec api alembic upgrade head
 ```
 
 A aplicação ficará disponível em:
@@ -133,7 +156,7 @@ A aplicação ficará disponível em:
 http://localhost:8000
 ```
 
-Documentação Swagger:
+Swagger:
 
 ```
 http://localhost:8000/docs
@@ -149,7 +172,7 @@ http://localhost:8000/redoc
 
 # 💻 Executando Localmente (sem Docker)
 
-Crie um ambiente virtual.
+## Criar ambiente virtual
 
 ### Windows
 
@@ -159,7 +182,7 @@ python -m venv venv
 venv\Scripts\activate
 ```
 
-### Linux / Mac
+### Linux / macOS
 
 ```bash
 python3 -m venv venv
@@ -167,19 +190,27 @@ python3 -m venv venv
 source venv/bin/activate
 ```
 
-Instale as dependências.
+## Instalar dependências
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Execute as migrações:
+## Configurar o arquivo `.env`
+
+Altere apenas o host do banco:
+
+```env
+DB_HOST=localhost
+```
+
+## Executar as migrações
 
 ```bash
 alembic upgrade head
 ```
 
-Inicie a API.
+## Iniciar a API
 
 ```bash
 uvicorn app.main:app --reload
@@ -318,7 +349,7 @@ Exemplo:
 
 **GET** `/figurinhas/progresso`
 
-Resposta:
+### Resposta
 
 ```json
 {
@@ -334,7 +365,7 @@ Resposta:
 
 As rotas protegidas utilizam autenticação JWT.
 
-Inclua o token no header da requisição:
+Inclua o token no cabeçalho da requisição:
 
 ```http
 Authorization: Bearer SEU_TOKEN
@@ -348,7 +379,6 @@ Authorization: Bearer SEU_TOKEN
 - Paginação de resultados
 - Cache com Redis
 - Deploy em nuvem
-- Versionamento da API
 - CI/CD com GitHub Actions
 - Monitoramento e observabilidade
 
@@ -358,4 +388,4 @@ Authorization: Bearer SEU_TOKEN
 
 **Guilherme Passarim**
 
-Projeto desenvolvido para estudos de desenvolvimento Backend utilizando **FastAPI**, **SQLAlchemy**, **PostgreSQL**, **Alembic**, **JWT** e **Docker**.
+Projeto desenvolvido para fins de estudo e prática de desenvolvimento Backend utilizando **FastAPI**, **SQLAlchemy**, **PostgreSQL**, **Alembic**, **JWT** e **Docker**.
