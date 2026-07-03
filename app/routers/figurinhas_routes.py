@@ -42,7 +42,7 @@ async def listar_figurinhas(usuario: Usuario = Depends(verificar_token), session
         {
             "sigla": figurinha.sigla,
             "numero": figurinha.numero,
-            "quantidade": (figurinha.quantidade)-1,
+            "quantidade": (figurinha.quantidade),
             "observacao": figurinha.observacao
         }
         for figurinha in minhas_figurinhas
