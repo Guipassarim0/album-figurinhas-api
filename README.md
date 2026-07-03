@@ -1,51 +1,62 @@
-# Sticker Album API
+# 🎴 Sticker Album API
 
-API REST desenvolvida em Python com FastAPI para gerenciamento de álbuns de figurinhas, incluindo autenticação JWT, controle de usuários e gerenciamento completo das figurinhas de cada coleção.
-
-## 🚀 Funcionalidades
-
-### Autenticação
-
-* Cadastro de usuários
-* Login com JWT
-* Login compatível com OAuth2
-* Refresh Token
-* Rotas protegidas por autenticação
-
-### Gerenciamento de Figurinhas
-
-* Adicionar figurinhas ao álbum
-* Atualizar automaticamente a quantidade de figurinhas repetidas
-* Remover figurinhas
-* Consulta de figurinhas específicas
-* Listagem completa do álbum
-* Listagem de figurinhas repetidas
-* Cálculo automático do progresso do álbum
-
-### Banco de Dados
-
-* PostgreSQL
-* SQLAlchemy ORM
-* Migrações com Alembic
+API REST desenvolvida em **Python** com **FastAPI** para gerenciamento de álbuns de figurinhas, incluindo autenticação JWT, controle de usuários, gerenciamento completo das figurinhas e execução totalmente **dockerizada**.
 
 ---
 
-## 🛠 Tecnologias Utilizadas
+# 🚀 Funcionalidades
 
-* Python 3
-* FastAPI
-* SQLAlchemy
-* PostgreSQL
-* Alembic
-* JWT (python-jose)
-* Passlib + Bcrypt
-* Pydantic
-* Uvicorn
-* Python Dotenv
+## 🔐 Autenticação
+
+- Cadastro de usuários
+- Login com JWT
+- Login compatível com OAuth2
+- Refresh Token
+- Rotas protegidas por autenticação
+
+## 🎴 Gerenciamento de Figurinhas
+
+- Adicionar figurinhas ao álbum
+- Atualização automática da quantidade de figurinhas repetidas
+- Remover figurinhas
+- Consultar figurinhas específicas
+- Listagem completa do álbum
+- Listagem de figurinhas repetidas
+- Cálculo automático do progresso do álbum
+
+## 🗄 Banco de Dados
+
+- PostgreSQL
+- SQLAlchemy ORM
+- Migrações com Alembic
+
+## 🐳 Docker
+
+- Aplicação totalmente dockerizada
+- Banco de dados PostgreSQL executando em container
+- Orquestração utilizando Docker Compose
+- Ambiente padronizado para desenvolvimento e execução
 
 ---
 
-## 📂 Estrutura do Projeto
+# 🛠 Tecnologias Utilizadas
+
+- Python 3
+- FastAPI
+- SQLAlchemy
+- PostgreSQL
+- Alembic
+- Pydantic
+- JWT (python-jose)
+- Passlib + Bcrypt
+- Uvicorn
+- Python Dotenv
+- Docker
+- Docker Compose
+
+---
+
+# 📂 Estrutura do Projeto
 
 ```text
 app/
@@ -59,25 +70,88 @@ app/
 ├── dependencies.py
 ├── main.py
 │
+alembic/
+docker-compose.yml
+Dockerfile
 .env
 requirements.txt
 ```
 
 ---
 
-## ⚙️ Instalação
+# ⚙️ Instalação
 
-### 1. Clonar o repositório
+## 1. Clone o repositório
 
 ```bash
-git clone https://github.com/seu-usuario/album-figurinhas-api.git
+git clone https://github.com/Guipassarim0/album-figurinhas-api.git
 
 cd album-figurinhas-api
 ```
 
-### 2. Criar ambiente virtual
+---
 
-Windows:
+# 🔧 Configuração
+
+Crie um arquivo `.env` na raiz do projeto.
+
+```env
+SECRET_KEY=sua_chave_secreta
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+
+DATABASE_URL=postgresql://usuario:senha@db:5432/sticker_album
+```
+
+> **Observação:** ao utilizar Docker, o host do banco deve ser o nome do serviço definido no `docker-compose.yml` (ex.: `db`).
+
+---
+
+# ▶️ Executando com Docker (Recomendado)
+
+Construir as imagens:
+
+```bash
+docker compose build
+```
+
+Iniciar os containers:
+
+```bash
+docker compose up
+```
+
+Ou em segundo plano:
+
+```bash
+docker compose up -d
+```
+
+A aplicação ficará disponível em:
+
+```
+http://localhost:8000
+```
+
+Documentação Swagger:
+
+```
+http://localhost:8000/docs
+```
+
+ReDoc:
+
+```
+http://localhost:8000/redoc
+```
+
+---
+
+# 💻 Executando Localmente (sem Docker)
+
+Crie um ambiente virtual.
+
+### Windows
 
 ```bash
 python -m venv venv
@@ -85,7 +159,7 @@ python -m venv venv
 venv\Scripts\activate
 ```
 
-Linux/Mac:
+### Linux / Mac
 
 ```bash
 python3 -m venv venv
@@ -93,50 +167,22 @@ python3 -m venv venv
 source venv/bin/activate
 ```
 
-### 3. Instalar dependências
+Instale as dependências.
 
 ```bash
 pip install -r requirements.txt
 ```
 
----
+Execute as migrações:
 
-## 🔧 Configuração
-
-Crie um arquivo `.env` na raiz do projeto:
-
-```env
-SECRET_KEY=sua_chave_secreta
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=30
-
-DATABASE_URL=postgresql://usuario:senha@localhost:5432/sticker_album
+```bash
+alembic upgrade head
 ```
 
----
-
-## ▶️ Executando a API
+Inicie a API.
 
 ```bash
 uvicorn app.main:app --reload
-```
-
-Após iniciar:
-
-```text
-http://127.0.0.1:8000
-```
-
-Documentação automática:
-
-```text
-http://127.0.0.1:8000/docs
-```
-
-Swagger ReDoc:
-
-```text
-http://127.0.0.1:8000/redoc
 ```
 
 ---
@@ -145,14 +191,14 @@ http://127.0.0.1:8000/redoc
 
 ## Criar Conta
 
-POST `/auth/criar_conta`
+**POST** `/auth/criar_conta`
 
 ### Exemplo
 
 ```json
 {
-  "nome": "Luis",
-  "email": "luis@email.com",
+  "nome": "Guilherme",
+  "email": "guilherme@email.com",
   "senha": "123456"
 }
 ```
@@ -161,13 +207,13 @@ POST `/auth/criar_conta`
 
 ## Login
 
-POST `/auth/login`
+**POST** `/auth/login`
 
 ### Exemplo
 
 ```json
 {
-  "email": "luis@email.com",
+  "email": "guilherme@email.com",
   "senha": "123456"
 }
 ```
@@ -186,13 +232,13 @@ POST `/auth/login`
 
 ## Login OAuth2
 
-POST `/auth/login_form`
+**POST** `/auth/login_form`
 
 ---
 
 ## Refresh Token
 
-GET `/auth/refresh`
+**GET** `/auth/refresh`
 
 ---
 
@@ -204,7 +250,7 @@ Todas as rotas abaixo exigem autenticação JWT.
 
 ## Listar Figurinhas
 
-GET `/figurinhas/listar`
+**GET** `/figurinhas/listar`
 
 ### Resposta
 
@@ -223,9 +269,7 @@ GET `/figurinhas/listar`
 
 ## Adicionar Figurinha
 
-POST `/figurinhas/criar_figurinha`
-
-### Exemplo
+**POST** `/figurinhas/criar_figurinha`
 
 ```json
 {
@@ -240,9 +284,7 @@ POST `/figurinhas/criar_figurinha`
 
 ## Remover Figurinha
 
-POST `/figurinhas/remover_figurinha`
-
-### Exemplo
+**POST** `/figurinhas/remover_figurinha`
 
 ```json
 {
@@ -256,40 +298,27 @@ POST `/figurinhas/remover_figurinha`
 
 ## Consultar Figurinha
 
-GET `/figurinhas/{sigla}/{numero}`
+**GET** `/figurinhas/{sigla}/{numero}`
 
-### Exemplo
+Exemplo:
 
-```text
+```
 /figurinhas/BRA/10
 ```
 
 ---
 
-## Verificar Repetidas
+## Figurinhas Repetidas
 
-GET `/figurinhas/repetidas`
-
-### Resposta
-
-```json
-[
-  {
-    "sigla": "BRA",
-    "numero": 10,
-    "quantidade": 2,
-    "observacao": "Neymar"
-  }
-]
-```
+**GET** `/figurinhas/repetidas`
 
 ---
 
 ## Progresso do Álbum
 
-GET `/figurinhas/progresso`
+**GET** `/figurinhas/progresso`
 
-### Resposta
+Resposta:
 
 ```json
 {
@@ -301,11 +330,11 @@ GET `/figurinhas/progresso`
 
 ---
 
-## 🔒 Segurança
+# 🔒 Autenticação
 
-A autenticação é baseada em JWT.
+As rotas protegidas utilizam autenticação JWT.
 
-Para acessar rotas protegidas:
+Inclua o token no header da requisição:
 
 ```http
 Authorization: Bearer SEU_TOKEN
@@ -313,20 +342,20 @@ Authorization: Bearer SEU_TOKEN
 
 ---
 
-## 📈 Melhorias Futuras
+# 📈 Melhorias Futuras
 
-* Docker
-* Testes automatizados
-* Paginação de resultados
-* Cache com Redis
-* Deploy em nuvem
-* Versionamento da API
-* CI/CD com GitHub Actions
+- Testes automatizados
+- Paginação de resultados
+- Cache com Redis
+- Deploy em nuvem
+- Versionamento da API
+- CI/CD com GitHub Actions
+- Monitoramento e observabilidade
 
 ---
 
-## 👨‍💻 Autor
+# 👨‍💻 Autor
 
-Guilherme Passarim
+**Guilherme Passarim**
 
-Projeto desenvolvido para estudos de FastAPI, SQLAlchemy, PostgreSQL e autenticação JWT.
+Projeto desenvolvido para estudos de desenvolvimento Backend utilizando **FastAPI**, **SQLAlchemy**, **PostgreSQL**, **Alembic**, **JWT** e **Docker**.
